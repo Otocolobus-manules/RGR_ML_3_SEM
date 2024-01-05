@@ -6,6 +6,7 @@ from sklearn.metrics import f1_score
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
+import tensorflow as tf
 sys.path.append('project/python_scripts')
 from DataPreprocessing import data_preprocessing as dtp
 from the_classic_model_with_a_teacher import polynomial_predict as plmpr
@@ -13,6 +14,7 @@ from the_classic_model_with_a_teacher import knn_predict as knnpr
 from ansambel import ansambel as ans
 from line_predict import line_predict_regression, line_predict_classification
 from The_classic_model_without_a_teacher import cluster_process
+from neural_network import neural_network
 
 
 def plot_func(y, predct):
@@ -124,7 +126,18 @@ if model == "Модель регресии":
                 ansambel_output(data, "price", model)
 
             case "Полносвязная нейронная сеть":
-                model = pickle.load(open(filename, "rb"))
+                model = tf.keras.models.load_model(r"project/models/neuro_regression")
+                try:
+                    x, y, predict, plt,  *args = neural_network(data, model, "price")
+                    stm.markdown("#### Полученные предсказания")
+                    stm.dataframe(predict)
+                    stm.markdown("#### Метрики и график")
+                    for i in range(len(args)):
+                        stm.markdown(args[i])
+
+                    stm.pyplot(plt)
+                except:
+                    stm.markdown('_При работе с датасетом возникла ошибка_')
 
 elif model == "Модель классификации":
     stm.title("Модель классификации")
@@ -195,7 +208,15 @@ elif model == "Модель классификации":
                 ansambel_output(data, "fraud", model)
 
             case "Полносвязная нейронная сеть":
-                stm.markdown(model)
+                model = tf.keras.models.load_model(r"project/models/neuro_classification")
+                x, y, predict, plt,  *args = neural_network(data, model, "fraud")
+                stm.markdown("#### Полученные предсказания")
+                stm.dataframe(predict)
+                stm.markdown("#### Метрики и график")
+                for i in range(len(args)):
+                    stm.markdown(args[i])
+
+                stm.pyplot(plt)
 
 elif model == "Получение предсказания по строчке данных":
     stm.title("Получение предсказания")
