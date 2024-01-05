@@ -12,6 +12,7 @@ from the_classic_model_with_a_teacher import polynomial_predict as plmpr
 from the_classic_model_with_a_teacher import knn_predict as knnpr
 from ansambel import ansambel as ans
 from line_predict import line_predict_regression, line_predict_classification
+from The_classic_model_without_a_teacher import cluster_process
 
 
 def plot_func(y, predct):
@@ -66,8 +67,9 @@ if model == "Модель регресии":
     elif data is not None:
         stm.sidebar.write("Получение предсказаний для модели регрессии")
         model = stm.sidebar.radio("Модели", options=("Информационное окно",
-                                                     "Модель классического обучения с учителем",
-                                                     "Модель классического обучения без учителя",
+                                                     "Модель классического обучения"
+                                                     " с учителем(Полиномиальная регрессия)",
+                                                     "Модель классического обучения без учителя(метод К соседей)",
                                                      "Ансамблевая модель Boosting",
                                                      "Ансамблевая модель Stacking",
                                                      "Ансамблевая модель Bagging",
@@ -81,7 +83,7 @@ if model == "Модель регресии":
                              "На получение предсказаний от некоторых моделей требуется немало времени,"
                              "поэтому сразу приносим извенения за ожидание)")
 
-            case "Модель классического обучения с учителем":
+            case "Модель классического обучения с учителем(Полиномиальная регрессия)":
                 filename = "project/models/polynomial_regression.sav"
                 model = pickle.load(open(filename, "rb"))
                 try:
@@ -94,8 +96,20 @@ if model == "Модель регресии":
                 except:
                     stm.markdown('_При работе с датасетом возникла ошибка_')
 
-            case "Модель классического обучения без учителя":
-                model = pickle.load(open(filename, "rb"))
+            case "Модель классического обучения без учителя(метод К соседей)":
+                model = pickle.load(open("project/models/cluster_regression_kmeans.sav", "rb"))
+                try:
+                    x, y, predict, plt, *args = cluster_process(data, model, "price")
+
+                    stm.markdown("#### Полученные кластеры:  ")
+                    stm.dataframe(predict)
+
+                    stm.markdown("#### Метрики и визуализация")
+                    for metric in args:
+                        stm.markdown(metric)
+                    stm.pyplot(plt)
+                except:
+                    stm.markdown('_При работе с датасетом возникла ошибка_')
 
             case "Ансамблевая модель Boosting":
                 model = pickle.load(open("project/models/boosting_regression.sav", "rb"))
@@ -139,7 +153,7 @@ elif model == "Модель классификации":
                              "На получение предсказаний от некоторых моделей требуется немало времени,"
                              "поэтому сразу приносим извенения за ожидание)")
 
-            case "Модель классического обучения с учителем":
+            case "Модель классического обучения с учителем(KNN)":
                 filename = "project/models/knn_model.sav"
                 model = pickle.load(open(filename, "rb"),  encoding='ASCII')
                 try:
@@ -152,8 +166,20 @@ elif model == "Модель классификации":
                 except:
                     stm.markdown('_При работе с датасетом возникла ошибка_')
 
-            case "Модель классического обучения без учителя":
-                stm.markdown(model)
+            case "Модель классического обучения без учителя(Иерархическая кластеризация)":
+                model = pickle.load(open("project/models/cluster_classification_ierarh.sav", "rb"))
+                try:
+                    x, y, predict, plt, *args = cluster_process(data, model, "fraud")
+
+                    stm.markdown("#### Полученные кластеры:  ")
+                    stm.dataframe(predict)
+
+                    stm.markdown("#### Метрики и визуализация")
+                    for metric in args:
+                        stm.markdown(metric)
+                    stm.pyplot(plt)
+                except:
+                    stm.markdown('_При работе с датасетом возникла ошибка_')
 
             case "Ансамблевая модель Boosting":
                 model = pickle.load(open("project/models/boosting_classification.sav", "rb"))
