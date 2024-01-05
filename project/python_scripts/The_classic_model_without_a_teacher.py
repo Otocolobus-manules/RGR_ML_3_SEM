@@ -9,7 +9,8 @@ def cluster_process(data, model, param):
     Возвращает датасет с целевым без целевого признака и признак, предсказания, график и метрики
     """
     if param == "fraud":
-        data = data[:25000]
+        if data.shape[0] >= 25000:
+            data = data[:25000]
     y = data[param].to_numpy()
     x = data.drop([param], axis=1).to_numpy()
     if param == "price":
