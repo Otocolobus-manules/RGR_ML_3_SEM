@@ -1,5 +1,4 @@
-from st_pages import Page, show_pages, add_page_title, Section
-import streamlit as stm
+from st_pages import Page, show_pages, add_page_title
 import json
 
 
